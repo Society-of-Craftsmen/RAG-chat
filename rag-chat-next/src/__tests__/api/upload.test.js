@@ -10,4 +10,16 @@ describe('TEST /api/upload', () => {
     expect(res._getStatusCode()).toBe(405);
     expect(res._getJSONData()).toEqual({error : "Method not allowed"});
   });
+
+  it('error code 401 on Unauthorized request', async () => {
+    const {req, res} = createMocks({
+      method: 'POST',
+      headers: {},
+    });
+    await handler(req, res);
+    expect(res._getStatusCode()).toBe(401);
+    expect(res._getJSONData()).toEqual({error : "Unathorized access"});
+  });
+
+  
 });

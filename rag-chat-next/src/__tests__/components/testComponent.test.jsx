@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import TestComponent from "@/components/testComponent";
+import '@testing-library/jest-dom';
+import TestComponent from "../../components/testComponent";
 
 describe("Test Component",() => {
     it("renders an element", () => {

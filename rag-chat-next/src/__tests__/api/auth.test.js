@@ -8,6 +8,6 @@ describe('GET /api/auth', () => {
     });
     await handler(req, res);
     expect(res._getStatusCode()).toBe(200);
-    expect(res._getJSONData()).toBe({message : "Authentication endpoint"});
+    expect(res._getJSONData()).toEqual({message : "Authentication endpoint"});
   });
 });

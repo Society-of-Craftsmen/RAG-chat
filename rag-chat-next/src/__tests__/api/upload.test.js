@@ -21,5 +21,13 @@ describe('TEST /api/upload', () => {
     expect(res._getJSONData()).toEqual({error : "Unathorized access"});
   });
 
-  
+  it('error code 401 on Invalid token', async () => {
+    const {req, res} = createMocks({
+      method: 'POST',
+      headers: {authorization: 'Bearer token123xyz'},
+    });
+    await handler(req, res);
+    expect(res._getStatusCode()).toBe(401);
+    expect(res._getJSONData()).toEqual({error : "Invalid token"});
+  });
 });

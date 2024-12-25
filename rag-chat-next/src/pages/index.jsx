@@ -1,7 +1,20 @@
-import React from 'react';
+'use client'
+import React, { useState } from 'react';
 
-export default function IndexPage() {
-  return <div>
-    <h1>Hello World</h1>
-  </div>
-}
+const HomePage = () => {
+  const [fileName, setFileName] = useState('');
+  const [isFileUploaded, setIsFileUploaded] = useState(false);
+
+  const handleFileUpload = (uploadedFileName) => {
+    setFileName(uploadedFileName);
+    setIsFileUploaded(true);
+  };
+
+  return (
+    <div>
+      <h1>Hello World</h1>
+    </div>
+  );
+};
+
+export default HomePage;

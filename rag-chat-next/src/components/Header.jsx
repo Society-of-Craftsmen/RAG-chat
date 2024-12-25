@@ -2,7 +2,15 @@
 import React, { useEffect, useState } from 'react';
 
 const Header = () => {
-    return null;
+    return (
+        <header>
+            <div>
+                <h1>
+                    Welcome to RAG-chat
+                </h1>
+            </div>
+        </header>
+    )
 };
 
 export default Header;

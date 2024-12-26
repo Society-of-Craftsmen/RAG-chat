@@ -23,6 +23,7 @@ const handler = async (req, res) => {
       messageChunks.push(message.slice(i, i + CHUNK_SIZE));
     }
 
+    
     // Generate embeddings for message chunks
     const embeddingModel = new HuggingFaceTransformersEmbeddings({
       model: "Xenova/all-MiniLM-L6-v2",
@@ -34,29 +35,43 @@ const handler = async (req, res) => {
       messageEmbeddings.push(embedding);
     }
 
+
     // Match embeddings with file embeddings and get top 5 matching chunks
     const topChunks = await index.query({
       topK: 5,
       vector: messageEmbeddings[0], // Assuming single chunk for simplicity
       includeMetadata: true,
     });
+    console.log("Top chunks:", topChunks);
+
 
     // Combine top chunks into a single context
     const context = topChunks.matches.map(match => match.metadata.chunk).join(" ");
+    console.log("Context:", context);
+    const context2 = "this pdf is all about a guy named heet";
+
 
     // Generate response using Hugging Face Inference API
-    const response = await axios.post('https://api-inference.huggingface.co/models/gpt-3.5-turbo', {
-      inputs: {
-        context,
-        message,
+    const response = await axios.post(
+      'https://api-inference.huggingface.co/models/timpal0l/mdeberta-v3-base-squad2',
+      {
+        inputs: {
+          question: message,
+          context: context2
+        }
       },
-    }, {
-      headers: {
-        Authorization: `Bearer ${process.env.HUGGING_FACE_API_KEY}`,
-      },
-    });
+      {
+        headers: {
+          'Authorization': `Bearer ${process.env.HUGGING_FACE_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
 
-    const botResponse = response.data.generated_text;
+    // The response format from this model will be different
+    // It returns an array with answer, score, and start/end positions
+    const botResponse = response.data[0]?.answer || 'No answer found';
+
 
     // Save user query and bot response to MongoDB
     const ChatModel = mongoose.model("chats", new mongoose.Schema({

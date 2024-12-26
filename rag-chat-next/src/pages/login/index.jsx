@@ -17,6 +17,7 @@ function Login() {
             if (res) {
                 console.log('User allowed:', res.user);
                 const idToken = await res.user.getIdToken();
+                console.log('firebase id Token:', idToken);
                 sessionStorage.setItem('token', idToken);
                 sessionStorage.setItem('user', true);
                 sessionStorage.setItem('userEmail', email);

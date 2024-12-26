@@ -7,6 +7,15 @@ export const verifyToken = (req, res, next) => {
     }
 
     try {
+        const serviceAccountBase64 = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+        const serviceAccount = JSON.parse(Buffer.from(serviceAccountBase64, 'base64').toString('utf8'));
+
+        // Initialize Firebase Admin SDK
+        if (!admin.apps.length) {
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount)
+            });
+        }
         const decodedToken = admin.auth().verifyIdToken(token);
         req.user = decodedToken;
         next();

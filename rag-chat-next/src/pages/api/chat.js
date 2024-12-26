@@ -42,13 +42,13 @@ const handler = async (req, res) => {
       vector: messageEmbeddings[0], // Assuming single chunk for simplicity
       includeMetadata: true,
     });
-    console.log("Top chunks:", topChunks);
+    // console.log("Top chunks:", topChunks);
 
 
     // Combine top chunks into a single context
     const context = topChunks.matches.map(match => match.metadata.chunk).join(" ");
-    console.log("Context:", context);
-    const context2 = "this pdf is all about a guy named heet";
+    //console.log("Context:", context);
+    
 
 
     // Generate response using Hugging Face Inference API
@@ -57,7 +57,7 @@ const handler = async (req, res) => {
       {
         inputs: {
           question: message,
-          context: context2
+          context: context
         }
       },
       {

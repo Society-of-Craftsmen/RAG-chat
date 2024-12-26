@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
 
-export const authenticate = (req, res, next) => {
+export const verifyToken = (req, res, next) => {
     const token = req.headers.authorization?.split('Bearer ')[1];
     if (!token) {
         return res.status(401).json({error: "Unathorized access"});

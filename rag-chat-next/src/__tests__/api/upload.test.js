@@ -1,5 +1,5 @@
 import { createMocks } from 'node-mocks-http';
-import handler from '../../pages/api/upload'; // Update to the actual API route
+import handler from '../../pages/api/upload';
 
 describe('TEST /api/upload', () => {
   it('error code 405 on GET', async () => {

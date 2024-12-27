@@ -16,8 +16,13 @@ const handler = async (req, res) => {
     await connectDB();
     const index = await connectPinecone();
 
+    
+    const indexInfo = await index.describeIndexStats();
+    console.log("Index stats:", indexInfo);
+    
+    
     // Split message into chunks
-    const CHUNK_SIZE = 500;
+    const CHUNK_SIZE = 1000;
     const messageChunks = [];
     for (let i = 0; i < message.length; i += CHUNK_SIZE) {
       messageChunks.push(message.slice(i, i + CHUNK_SIZE));
@@ -35,21 +40,29 @@ const handler = async (req, res) => {
       messageEmbeddings.push(embedding);
     }
 
+    // Debug: Log embeddings and userId
+    //console.log("User ID:", userId);
+    //console.log("Query vector dimension:", messageEmbeddings[0]?.length);
 
     // Match embeddings with file embeddings and get top 5 matching chunks
-    const topChunks = await index.query({
+    const searchResponse = await index.namespace('ns1').query({
+      vector: messageEmbeddings[0],
       topK: 5,
-      vector: messageEmbeddings[0], // Assuming single chunk for simplicity
+      //filter: { userId },
       includeMetadata: true,
+      includeValues: true
     });
-    // console.log("Top chunks:", topChunks);
 
+    //console.log("Search response----------------->:", JSON.stringify(searchResponse, null, 2));
 
-    // Combine top chunks into a single context
-    const context = topChunks.matches.map(match => match.metadata.chunk).join(" ");
+    // Extract matching chunks from metadata
+    const matchingChunks = searchResponse.matches.map(match => match.metadata.chunk);
+    const context = matchingChunks.join(" ");
+
+    // Debug logs
+    console.log("Number of matches found:", searchResponse.matches.length);
+    //console.log("First chunk:", matchingChunks[0]);
     //console.log("Context:", context);
-    
-
 
     // Generate response using Hugging Face Inference API
     const response = await axios.post(
@@ -70,23 +83,27 @@ const handler = async (req, res) => {
 
     // The response format from this model will be different
     // It returns an array with answer, score, and start/end positions
-    const botResponse = response.data[0]?.answer || 'No answer found';
+    console.log("Bot response:+++++++++++++++++++++++", response.data.answer);
+    const botResponse = response.data.answer;
+    if(!response.data.answer){
+      botResponse = "No answer found";
+    }
 
 
     // Save user query and bot response to MongoDB
-    const ChatModel = mongoose.model("chats", new mongoose.Schema({
-      userId: String,
-      message: String,
-      response: String,
-      createdAt: Date,
-    }));
+    // const ChatModel = mongoose.model("chats", new mongoose.Schema({
+    //   userId: String,
+    //   message: String,
+    //   response: String,
+    //   createdAt: Date,
+    // }));
 
-    await ChatModel.create({
-      userId,
-      message,
-      response: botResponse,
-      createdAt: new Date(),
-    });
+    // await ChatModel.create({
+    //   userId,
+    //   message,
+    //   response: botResponse,
+    //   createdAt: new Date(),
+    // });
 
     res.status(200).json({ response: botResponse });
   } catch (error) {

@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 import { createMocks } from 'node-mocks-http';
 import handler from '../../pages/api/upload';
 

@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
 
-export const verifyToken = (req, res, next) => {
+export const verifyToken = async (req, res, next) => {
     const token = req.headers.authorization?.split('Bearer ')[1];
     if (!token) {
         return res.status(401).json({error: "Unathorized access"});
@@ -16,8 +16,8 @@ export const verifyToken = (req, res, next) => {
                 credential: admin.credential.cert(serviceAccount)
             });
         }
-        const decodedToken = admin.auth().verifyIdToken(token);
-        req.user = decodedToken;
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        req.user = decodedToken; 
         next();
     } catch {
         return res.status(401).json({error: "Invalid token"});

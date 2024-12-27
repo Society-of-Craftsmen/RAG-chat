@@ -58,12 +58,12 @@ const handler = async (req, res) => {
       // Store embeddings in Pinecone
       let i = 0;
       for (const { vector, chunk } of embeddings) {
-        await index.namespace('ns1').upsert([{ id: `${userId}-${file.originalname}-${i}`, values: vector, metadata: { chunk, userId } }]);
+        await index.namespace('ns1').upsert([{ id: `${file.originalname}-${Date.now()}-${i}`, values: vector, metadata: { chunk, userId } }]);
         i++;
       }
 
       // Save metadata in MongoDB
-      const PDFModel = mongoose.model("pdfs", new mongoose.Schema({
+      const PDFModel = mongoose.models.pdfs || mongoose.model("pdfs", new mongoose.Schema({
         userId: String,
         fileName: String,
         uploadedAt: Date
@@ -82,7 +82,7 @@ const handler = async (req, res) => {
   });
 };
 
-export default (req, res) => {
+export default async (req, res) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', `*`); //${process.env.FRONTEND_URL}
   res.setHeader('Access-Control-Allow-Methods', 'POST');
@@ -97,5 +97,5 @@ export default (req, res) => {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
-  verifyToken(req, res, () => handler(req, res));
+  await verifyToken(req, res, async () => handler(req, res));
 }

@@ -37,10 +37,11 @@ const PDFUpload = ({ onFileUpload }) => {
                 if (response.status !== 200) {
                     alert('File upload failed');
                 }
-
-                alert('File uploaded successfully!');
-                setFileName(file.name);
-                onFileUpload(file.name); // Pass the file name to the parent
+                else {
+                    alert('File uploaded successfully!');
+                    setFileName(file.name);
+                    onFileUpload(file.name); // Pass the file name to the parent
+                }
             } catch (error) {
                 alert('Error uploading file:', error);
             }

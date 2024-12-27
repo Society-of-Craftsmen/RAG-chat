@@ -6,9 +6,9 @@ import mongoose from 'mongoose';
 import axios from 'axios';
 
 const handler = async (req, res) => {
-  const { message, userId } = req.body;
-
-  if (!message || !userId) {
+  const {message} = req.body;
+  //const userId = user?.uid;
+  if (!message) {
     return res.status(400).json({ error: "Message and userId are required" });
   }
 
@@ -108,7 +108,7 @@ const handler = async (req, res) => {
     res.status(200).json({ response: botResponse });
   } catch (error) {
     console.error("Error processing chat:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server erro r" });
   }
 };
 

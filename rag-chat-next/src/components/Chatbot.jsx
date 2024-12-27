@@ -6,6 +6,7 @@ const Chatbot = ({ fileName }) => {
     const [messages, setMessages] = useState([]);
     const [currentMessage, setCurrentMessage] = useState('');
     const [height, setHeight] = useState('auto');
+    const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef(null);
     const textareaRef = useRef(null);
 
@@ -24,20 +25,62 @@ const Chatbot = ({ fileName }) => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
-    const handleSendMessage = () => {
-        if (currentMessage) {
-            setMessages((prevMessages) => [
-                ...prevMessages,
-                { sender: 'user', text: currentMessage },
-            ]);
+    const handleSendMessage = async () => {
+        if (currentMessage && !isLoading) {
+            const user= sessionStorage.getItem('user');
+            const userId = user;   
 
-            setMessages((prevMessages) => [
-                ...prevMessages,
-                { sender: 'chatbot', text: currentMessage },
-            ]);
+            if (!userId) {
+                setMessages(prev => [...prev, { 
+                    sender: 'chatbot', 
+                    text: 'Error: You are not logged in. Please login again.' 
+                }]);
+                return;
+            }
 
+            const userMessage = currentMessage;
             setCurrentMessage('');
             setHeight('auto');
+
+            // Add user message immediately
+            setMessages(prev => [...prev, { sender: 'user', text: userMessage }]);
+            
+            setIsLoading(true);
+            try {
+                const token = sessionStorage.getItem('token');
+
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        message: userMessage,
+                        //userId: userId
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to get response');
+                }
+
+                const data = await response.json();
+                
+                // Add bot response
+                setMessages(prev => [...prev, { 
+                    sender: 'chatbot', 
+                    text: data.response 
+                }]);
+            } catch (error) {
+                console.error('Error:', error);
+                setMessages(prev => [...prev, { 
+                    sender: 'chatbot', 
+                    text: 'Sorry, I encountered an error while processing your request.' 
+                }]);
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
 
@@ -81,12 +124,21 @@ const Chatbot = ({ fileName }) => {
                         <span
                             className={`inline-block px-4 py-2 rounded-lg ${message.sender === 'user'
                                 ? 'bg-green-500 text-white text-left'
-                                : 'bg-gray-400 text-black'}`}
+                                : message.sender === 'error'
+                                    ? 'bg-red-500 text-white'
+                                    : 'bg-gray-400 text-black'}`}
                         >
                             {formatMessage(message.text)}
                         </span>
                     </div>
                 ))}
+                {isLoading && (
+                    <div className="flex justify-start">
+                        <div className="bg-gray-200 rounded-lg p-3">
+                            Thinking...
+                        </div>
+                    </div>
+                )}
                 <div ref={messagesEndRef} />
             </div>
 
@@ -100,11 +152,13 @@ const Chatbot = ({ fileName }) => {
                     rows="1"
                     className="flex-grow p-3 bg-slate-600 text-gray-300 focus:outline-none transition-all resize-none"
                     style={{ height: height }}
+                    disabled={isLoading}
                 />
                 <button
                     onClick={handleSendMessage}
                     className="ml-4 px-6 py-3 bg-green-500 text-white rounded-full hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all flex items-center justify-center"
                     data-testid="button"
+                    disabled={isLoading}
                 >
                     <FaPaperPlane className="text-xl" />
                 </button>

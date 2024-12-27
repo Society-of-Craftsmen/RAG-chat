@@ -63,16 +63,16 @@ const handler = async (req, res) => {
       }
 
       // Save metadata in MongoDB
-      const PDFModel = mongoose.model("pdfs", new mongoose.Schema({
-        userId: String,
-        fileName: String,
-        uploadedAt: Date
-      }));
-      await PDFModel.create({
-        userId: userId,
-        fileName: file.originalname,
-        uploadedAt: new Date()
-      });
+      // const PDFModel = mongoose.model("pdfs", new mongoose.Schema({
+      //   userId: String,
+      //   fileName: String,
+      //   uploadedAt: Date
+      // }));
+      // await PDFModel.create({
+      //   userId: userId,
+      //   fileName: file.originalname,
+      //   uploadedAt: new Date()
+      // });
 
       return res.status(200).json({ message: "File uploaded and processed successfully" });
 

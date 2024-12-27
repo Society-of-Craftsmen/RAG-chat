@@ -21,6 +21,9 @@ function Login() {
                 sessionStorage.setItem('user', true);
                 sessionStorage.setItem('userEmail', email);
                 router.push('/');
+                alert('Logged in successfully!');
+                alert(sessionStorage.getItem('token'));
+                alert(sessionStorage.getItem('user'));
             }
             else {
                 alert('Incorrect credentials!');

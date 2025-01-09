@@ -28,7 +28,7 @@ const PDFUpload = ({ onFileUpload }) => {
 
                 const token = sessionStorage.getItem('token');
                 // Send file to the server using fetch or axios
-                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/upload`, {
+                const response = await fetch('/api/upload/', {
                     method: 'POST',
                     body: formData,
                     headers: {'Authorization': `Bearer ${token}`}
@@ -82,7 +82,7 @@ const PDFUpload = ({ onFileUpload }) => {
             <p className="text-center items-center p-5 text-1xl">
                 Unlock the power of your PDFs with AI-driven conversations. Simply upload your document and start asking questions to get instant, relevant answers. Whether you're reviewing reports, studying, or exploring complex topics, our AI makes it easy to extract the information you need from your PDFs in seconds.
             </p>
-            <h2 className="font-extrabold text-center font-bold text-3xl p-3 text-green-500">Chat with your <span className="text-red-500 font-serif">PDFs</span> anywhere, anytime, on any device.</h2>
+            <h2 className="text-center font-bold text-3xl p-3 text-green-500">Chat with your <span className="text-red-500 font-serif">PDFs</span> anywhere, anytime, on any device.</h2>
         </div>
     );
 };

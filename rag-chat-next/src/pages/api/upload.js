@@ -83,17 +83,6 @@ const handler = async (req, res) => {
 };
 
 export default async (req, res) => {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', `*`); //${process.env.FRONTEND_URL}
-  res.setHeader('Access-Control-Allow-Methods', 'POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-  if (req.method === 'OPTIONS') {
-      // Pre-flight request (OPTIONS)
-      res.status(200).end();
-      return;
-  }
-
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
